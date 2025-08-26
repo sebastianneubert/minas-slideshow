@@ -57,28 +57,14 @@
   const branch = "main";
 
   async function loadImages() {
-    const url = `https://api.github.com/repos/${user}/${repo}/contents/${folder}?ref=${branch}`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    console.log("API response:", data); // 👀 check what GitHub returns
-
-    if (!Array.isArray(data)) {
-      console.error("GitHub API did not return a directory listing:", data);
-      const slideshow = document.getElementById("slideshow");
-      slideshow.innerHTML = `<div class="swiper-slide"><p style="color:white">No images found in <b>${folder}</b></p></div>`;
-      return;
-    }
-
+    const data = await fetch('./images.json').then(r => r.json());
     const slideshow = document.getElementById("slideshow");
 
-    data.forEach(file => {
-      if (file.type === "file" && file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-        const slide = document.createElement("div");
-        slide.className = "swiper-slide";
-        slide.innerHTML = `<img src="${file.download_url}" alt="${file.name}">`;
-        slideshow.appendChild(slide);
-      }
+    data.forEach(image => {
+      const slide = document.createElement("div");
+      slide.className = "swiper-slide";
+      slide.innerHTML = `<img src="https://${user}.github.io/${repo}/${image.path}" alt="${image.path}">`;
+      slideshow.appendChild(slide);
     });
 
     // Initialize Swiper after injecting slides
@@ -86,7 +72,7 @@
       spaceBetween: 10,
       centeredSlides: true,
       autoplay: {
-         delay: 2500,
+         delay: 1200,
          disableOnInteraction: false,
       },
       pagination: {
