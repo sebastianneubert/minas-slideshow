@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Directory Index</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #eee;
+      padding: 2rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 0.5rem 0;
+    }
+    a {
+      color: #4ecdc4;
+      text-decoration: none;
+      font-size: 1.2rem;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Available Galleries</h1>
+  <ul id="dir-list"></ul>
+
+  <script>
+    const user = "sebastianneubert";
+    const repo = "minas-slideshow";
+    const branch = "main";
+    const path  = "";
+
+    async function loadDirs() {
+      const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      const ul = document.getElementById("dir-list");
+
+      data.forEach(item => {
+        if (item.type === "dir") {
+          const li = document.createElement("li");
+          const link = document.createElement("a");
+          link.href = `./${item.name}/`;
+          link.textContent = item.name;
+          li.appendChild(link);
+          ul.appendChild(li);
+        }
+      });
+    }
+
+    loadDirs();
+  </script>
+</body>
+</html>
