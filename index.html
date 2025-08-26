@@ -2,57 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>My Magical Galleries ✨</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <title>Minas Overview</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2214%22 font-size=%2216%22>🦄</text></svg>">
+  <!-- QRCode.js -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
   <style>
+    /* Reset and body */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #ffe6f2, #e6f7ff);
-      color: #333;
+      font-family: 'Poppins', sans-serif;
+      background: #121212;
+      color: #eee;
       padding: 2rem;
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
     }
 
     h1 {
-      font-family: "Poppins", sans-serif;
+      font-size: 2.8rem;
       font-weight: 700;
-      font-size: 2.5rem;
-      color: #ff66b2;
-      margin-bottom: 1.5rem;
-      text-shadow: 2px 2px #fff;
-      line-height: 1.2;
+      margin-bottom: 2rem;
+      color: #4ecdc4;
+      text-align: center;
     }
-    
+
+    /* Grid */
     .grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 1200px;
       justify-content: center;
     }
 
+    /* Card */
     .card {
-      width: 180px;
-      height: 220px;
-      background: #fff;
+      display: flex;
+      flex-direction: row;
+      background: #1e1e1e;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       overflow: hidden;
-      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
       transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
       text-decoration: none;
       color: inherit;
-      display: flex;
-      flex-direction: column;
+      width: calc(33% - 1rem); /* 1/3 width minus gap */
+      min-height: 180px;
+      max-height: 220px;
     }
 
     .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 16px rgba(255, 105, 180, 0.3);
+      transform: scale(1.02);
+      box-shadow: 0 6px 20px rgba(78, 205, 196, 0.5);
     }
 
+    /* Thumbnail */
     .thumb {
-      flex: 1;
-      background: #f9f9f9;
+      flex: 0 0 120px;
+      background: #2a2a2a;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -60,25 +74,78 @@
     }
 
     .thumb img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain; /* no crop, full image visible */
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    .label {
-      padding: 0.5rem;
-      font-size: 1rem;
-      font-family: "Poppins", sans-serif; /* 👈 modern font */
+    /* Content (middle + right QR) */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: stretch;
+      padding: 0.8rem;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .gallery-name {
+      text-transform: capitalize;
+      font-size: 1.2rem;
       font-weight: 600;
-      background: linear-gradient(90deg, #ff99cc, #66ccff);
-      color: white;
-      text-align: center;
-      letter-spacing: 0.5px; /* a bit more elegant */
+      color: #ff79c6;
+      margin-bottom: auto;
+    }
+
+    /* QR code container */
+    .qr {
+      flex: 0 0 80px;
+      margin-left: 0.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #1e1e1e;
+    }
+
+    .qr canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* Responsive for mobile */
+    @media (max-width: 900px) {
+      .card {
+        width: calc(50% - 1rem); /* 2 per row */
+      }
+    }
+    @media (max-width: 600px) {
+      .card {
+        flex-direction: column;
+        width: 100%;
+        min-height: auto;
+      }
+      .thumb {
+        width: 100%;
+        height: 180px;
+      }
+      .content {
+        flex-direction: row;
+        padding: 0.5rem;
+      }
+      .qr {
+        flex: 0 0 60px;
+      }
     }
   </style>
 </head>
 <body>
-<h1>🌸 Minas Magical Galleries ✨</h1>
+<h1>Minas Galleries</h1>
 <div class="grid" id="dir-list"></div>
 
 <script>
@@ -87,51 +154,64 @@
   const branch = "main"; // or master
   const path  = "";      // root relative to repo
 
-  async function fetchJson(url) {
-    const res = await fetch(url);
-    return res.json();
-  }
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      return res.json();
+    }
 
-  async function loadDirs() {
-    const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
-    const data = await fetchJson(url);
+    async function loadDirs() {
+      const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
+      const data = await fetchJson(url);
 
-    const grid = document.getElementById("dir-list");
+      const grid = document.getElementById("dir-list");
 
-    for (const item of data) {
-      if (item.type === "dir") {
-        // Try to grab first image inside subdir/images
-        const imgApiUrl = `https://api.github.com/repos/${user}/${repo}/contents/${item.path}/images?ref=${branch}`;
-        let imgUrl = "https://via.placeholder.com/300x150.png?text=No+Image";
+      for (const item of data) {
+        if (item.type === "dir") {
+          const imgApiUrl = `https://api.github.com/repos/${user}/${repo}/contents/${item.path}/images?ref=${branch}`;
+          let imgUrl = "https://via.placeholder.com/120x180.png?text=No+Image";
 
-        try {
-          const files = await fetchJson(imgApiUrl);
-          const firstImg = files.find(f => f.type === "file" && f.name.match(/\.(jpg|jpeg|png|gif|webp)$/i));
-          if (firstImg) {
-            imgUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${item.path}/images/${firstImg.name}`;
+          try {
+            const files = await fetchJson(imgApiUrl);
+            const firstImg = files.find(f => f.type === "file" && f.name.match(/\.(jpg|jpeg|png|gif|webp)$/i));
+            if (firstImg) {
+              imgUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${item.path}/images/${firstImg.name}`;
+            }
+          } catch(e) {
+            console.log("No images folder in", item.name);
           }
-        } catch (e) {
-          console.log("No images folder in", item.name);
+
+          const card = document.createElement("a");
+          card.href = `./${item.name}/`;
+          card.className = "card";
+
+          card.innerHTML = `
+            <div class="thumb">
+              <img src="${imgUrl}" alt="${item.name}">
+            </div>
+            <div class="content">
+              <div class="info">
+                <div class="gallery-name">${item.name}</div>
+                <div class="qr" id="qr-${item.name}"></div>
+              </div>
+            </div>
+          `;
+
+          grid.appendChild(card);
+
+          // QR code full height
+          new QRCode(document.getElementById(`qr-${item.name}`), {
+            text: `${window.location.href}${item.name}/`,
+            width: 120,
+            height: 120,
+            colorDark : "#eee",
+            colorLight : "#1e1e1e",
+            correctLevel : QRCode.CorrectLevel.H
+          });
         }
-
-        // Build card
-        const card = document.createElement("a");
-        card.href = `./${item.name}/`;
-        card.className = "card";
-
-        card.innerHTML = `
-          <div class="thumb">
-            <img src="${imgUrl}" alt="${item.name}">
-          </div>
-          <div class="label">${item.name}</div>
-        `;
-
-        grid.appendChild(card);
       }
     }
-  }
 
-  loadDirs();
+    loadDirs();
 </script>
 </body>
 </html>
