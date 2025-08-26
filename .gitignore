@@ -1,0 +1,4 @@
+.idea
+*.log
+*.backup
+update_slideshow.sh
