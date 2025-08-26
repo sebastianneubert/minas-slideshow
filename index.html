@@ -1,45 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>GitHub Pages Slideshow</title>
-  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
-  <style>
-    body {
-      margin: 0;
-      background: #111;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .swiper {
-      width: 80%;
-      height: 80%;
-    }
-    .swiper-slide img {
-      display: block;
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>GitHub Pages Slideshow</title>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <style>
+        body {
+          margin: 0;
+          background: #111;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+        }
+
+        .swiper-slide {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #000;
+        }
+
+        .swiper-slide img {
+          max-width: 100%;
+          max-height: 100%;
+          width: auto;
+          height: auto;
+          object-fit: contain;
+        }
+    </style>
 </head>
 <body>
-  <!-- Slideshow container -->
-  <div class="swiper">
+<!-- Slideshow container -->
+<div class="swiper">
     <div class="swiper-wrapper" id="slideshow">
-      <!-- Slides will be injected here -->
+        <!-- Slides will be injected here -->
     </div>
     <!-- Navigation buttons -->
     <div class="swiper-button-next"></div>
     <div class="swiper-button-prev"></div>
     <!-- Pagination -->
     <div class="swiper-pagination"></div>
-  </div>
+</div>
 
-  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-  <script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
     // Replace with your repo info
     const user = "sebastianneubert";
     const repo = "minas-slideshow";
@@ -72,6 +77,6 @@
     }
 
     loadImages();
-  </script>
+</script>
 </body>
 </html>
