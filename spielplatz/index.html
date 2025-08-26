@@ -42,8 +42,8 @@
     <!-- Slides will be injected here -->
   </div>
   <!-- Navigation buttons -->
-  <div class="swiper-button-next"></div>
-  <div class="swiper-button-prev"></div>
+  <!--div class="swiper-button-next"></div>
+  <div class="swiper-button-prev"></div-->
   <!-- Pagination -->
   <div class="swiper-pagination"></div>
 </div>
@@ -71,6 +71,7 @@
     new Swiper('.swiper', {
       spaceBetween: 30,
       effect: "fade",
+      fadeEffect: { crossFade: true },
       centeredSlides: true,
       autoplay: {
          delay: 1200,
