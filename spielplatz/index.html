@@ -1,104 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>GitHub Pages Slideshow</title>
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
-    <style>
-        body {
-          margin: 0;
-          background: #111;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-        }
+  <meta charset="UTF-8">
+  <title>GitHub Pages Slideshow</title>
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-        .swiper {
-            width: 100%;
-            height: 100%;
-        }
+    .swiper {
+        width: 100%;
+        height: 100%;
+    }
 
-        .swiper-slide {
-            text-align: center;
-            font-size: 18px;
-            background: #fff;
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: -webkit-flex;
-            display: flex;
-            -webkit-box-pack: center;
-            -ms-flex-pack: center;
-            -webkit-justify-content: center;
-            justify-content: center;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            -webkit-align-items: center;
-            align-items: center;
-        }
-        .swiper-slide img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-    </style>
+    .swiper-slide {
+        text-align: center;
+        font-size: 18px;
+        background: #fff;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+    }
+    .swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+  </style>
 </head>
 <body>
 <!-- Slideshow container -->
 <div class="swiper">
-    <div class="swiper-wrapper" id="slideshow">
-        <!-- Slides will be injected here -->
-    </div>
-    <!-- Navigation buttons -->
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
-    <!-- Pagination -->
-    <div class="swiper-pagination"></div>
+  <div class="swiper-wrapper" id="slideshow">
+    <!-- Slides will be injected here -->
+  </div>
+  <!-- Navigation buttons -->
+  <div class="swiper-button-next"></div>
+  <div class="swiper-button-prev"></div>
+  <!-- Pagination -->
+  <div class="swiper-pagination"></div>
 </div>
 
 <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script>
-    // Replace with your repo info
-    const user = "sebastianneubert";
-    const repo = "minas-slideshow";
-    const folder = "spielplatz/images";
-    const branch = "main";
+  // Replace with your repo info
+  const user = "sebastianneubert";
+  const repo = "minas-slideshow";
+  const folder = "spielplatz/images";
+  const branch = "main";
 
-    async function loadImages() {
-      const url = `https://api.github.com/repos/${user}/${repo}/contents/${folder}?ref=${branch}`;
-      const res = await fetch(url);
-      const data = await res.json();
+  async function loadImages() {
+    const url = `https://api.github.com/repos/${user}/${repo}/contents/${folder}?ref=${branch}`;
+    const res = await fetch(url);
+    const data = await res.json();
 
+    console.log("API response:", data); // 👀 check what GitHub returns
+
+    if (!Array.isArray(data)) {
+      console.error("GitHub API did not return a directory listing:", data);
       const slideshow = document.getElementById("slideshow");
-
-      data.forEach(file => {
-        if (file.type === "file" && file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-          const slide = document.createElement("div");
-          slide.className = "swiper-slide";
-          slide.innerHTML = `<img src="https://raw.githubusercontent.com/${user}/${repo}/${branch}/${folder}/${file.name}" alt="${file.name}">`;
-          slideshow.appendChild(slide);
-        }
-      });
-
-      // Initialize Swiper after injecting slides
-      new Swiper('.swiper', {
-        spaceBetween: 30,
-        centeredSlides: true,
-        autoplay: {
-           delay: 2500,
-           disableOnInteraction: false,
-        },
-        pagination: {
-          el: '.swiper-pagination',
-          clickable: true,
-        },
-        loop: true,
-        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-      });
+      slideshow.innerHTML = `<div class="swiper-slide"><p style="color:white">No images found in <b>${folder}</b></p></div>`;
+      return;
     }
 
-    loadImages();
+    const slideshow = document.getElementById("slideshow");
+
+    data.forEach(file => {
+      if (file.type === "file" && file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        const slide = document.createElement("div");
+        slide.className = "swiper-slide";
+        slide.innerHTML = `<img src="${file.download_url}" alt="${file.name}">`;
+        slideshow.appendChild(slide);
+      }
+    });
+
+    // Initialize Swiper after injecting slides
+    new Swiper('.swiper', {
+      spaceBetween: 30,
+      centeredSlides: true,
+      autoplay: {
+         delay: 2500,
+         disableOnInteraction: false,
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      loop: true,
+      navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+    });
+  }
+
+  loadImages();
 </script>
 </body>
 </html>
