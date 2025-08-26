@@ -1,32 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Slideshow</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>GitHub Pages Slideshow</title>
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .swiper {
+      width: 80%;
+      height: 80%;
+    }
+    .swiper-slide img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+  </style>
 </head>
 <body>
-    <div class="slideshow-container">
-        <div id="loading" class="loading">
-            Loading images from /images directory...
-        </div>
-
-        <div id="error" class="error" style="display: none;">
-            No images found in the /images directory. Please make sure you have image files there.
-        </div>
-
-        <div id="slides-container"></div>
-
-        <div class="controls" id="controls" style="display: none;">
-            <button class="nav-btn" id="prevBtn">‹</button>
-            <button class="nav-btn play-pause-btn" id="playPauseBtn">⏸</button>
-            <button class="nav-btn" id="nextBtn">›</button>
-        </div>
-
-        <div class="dots-container" id="dotsContainer" style="display: none;"></div>
+  <!-- Slideshow container -->
+  <div class="swiper">
+    <div class="swiper-wrapper" id="slideshow">
+      <!-- Slides will be injected here -->
     </div>
+    <!-- Navigation buttons -->
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    <!-- Pagination -->
+    <div class="swiper-pagination"></div>
+  </div>
 
-    <script src="script.js"></script>
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    // Replace with your repo info
+    const user = "sebastianneubert";
+    const repo = "minas-slideshow";
+    const folder = "images";
+    const branch = "main";
+
+    async function loadImages() {
+      const url = `https://api.github.com/repos/${user}/${repo}/contents/${folder}?ref=${branch}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      const slideshow = document.getElementById("slideshow");
+
+      data.forEach(file => {
+        if (file.type === "file" && file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+          const slide = document.createElement("div");
+          slide.className = "swiper-slide";
+          slide.innerHTML = `<img src="https://raw.githubusercontent.com/${user}/${repo}/${branch}/${folder}/${file.name}" alt="${file.name}">`;
+          slideshow.appendChild(slide);
+        }
+      });
+
+      // Initialize Swiper after injecting slides
+      new Swiper('.swiper', {
+        loop: true,
+        autoplay: { delay: 3000 },
+        pagination: { el: '.swiper-pagination', clickable: true },
+        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+      });
+    }
+
+    loadImages();
+  </script>
 </body>
 </html>
