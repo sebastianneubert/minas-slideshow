@@ -4,30 +4,18 @@
   <meta charset="UTF-8">
   <title>My Magical Galleries ✨</title>
   <style>
-    body {
-      font-family: "Comic Sans MS", cursive, sans-serif;
-      background: linear-gradient(135deg, #ffe6f2, #e6f7ff);
-      color: #333;
-      padding: 2rem;
-      text-align: center;
-    }
-    h1 {
-      font-size: 2.5rem;
-      color: #ff66b2;
-      margin-bottom: 1.5rem;
-      text-shadow: 2px 2px #fff;
-    }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* smaller cards */
+      gap: 1rem;
       max-width: 1000px;
       margin: 0 auto;
     }
+
     .card {
       background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       overflow: hidden;
       cursor: pointer;
       transition: transform 0.3s, box-shadow 0.3s;
@@ -35,88 +23,94 @@
       color: inherit;
       display: flex;
       flex-direction: column;
+      height: 220px; /* smaller card height */
     }
+
     .card:hover {
       transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
+      box-shadow: 0 6px 16px rgba(255, 105, 180, 0.3);
     }
+
     .thumb {
-      height: 150px;
+      flex: 1;
       background: #f9f9f9;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
     }
+
     .thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;   /* show full vertical image */
     }
+
     .label {
-      padding: 1rem;
-      font-size: 1.2rem;
+      padding: 0.5rem;
+      font-size: 1rem;
       background: linear-gradient(90deg, #ff99cc, #66ccff);
       color: white;
       font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>🌸 Minas Magical Galleries ✨</h1>
-  <div class="grid" id="dir-list"></div>
+<h1>🌸 Minas Magical Galleries ✨</h1>
+<div class="grid" id="dir-list"></div>
 
-  <script>
-    const user = "sebastianneubert";
-    const repo = "minas-slideshow";
-    const branch = "main"; // or master
-    const path  = "";      // root relative to repo
+<script>
+  const user = "sebastianneubert";
+  const repo = "minas-slideshow";
+  const branch = "main"; // or master
+  const path  = "";      // root relative to repo
 
-    async function fetchJson(url) {
-      const res = await fetch(url);
-      return res.json();
-    }
+  async function fetchJson(url) {
+    const res = await fetch(url);
+    return res.json();
+  }
 
-    async function loadDirs() {
-      const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
-      const data = await fetchJson(url);
+  async function loadDirs() {
+    const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
+    const data = await fetchJson(url);
 
-      const grid = document.getElementById("dir-list");
+    const grid = document.getElementById("dir-list");
 
-      for (const item of data) {
-        if (item.type === "dir") {
-          // Try to grab first image inside subdir/images
-          const imgApiUrl = `https://api.github.com/repos/${user}/${repo}/contents/${item.path}/images?ref=${branch}`;
-          let imgUrl = "https://via.placeholder.com/300x150.png?text=No+Image";
+    for (const item of data) {
+      if (item.type === "dir") {
+        // Try to grab first image inside subdir/images
+        const imgApiUrl = `https://api.github.com/repos/${user}/${repo}/contents/${item.path}/images?ref=${branch}`;
+        let imgUrl = "https://via.placeholder.com/300x150.png?text=No+Image";
 
-          try {
-            const files = await fetchJson(imgApiUrl);
-            const firstImg = files.find(f => f.type === "file" && f.name.match(/\.(jpg|jpeg|png|gif|webp)$/i));
-            if (firstImg) {
-              imgUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${item.path}/images/${firstImg.name}`;
-            }
-          } catch (e) {
-            console.log("No images folder in", item.name);
+        try {
+          const files = await fetchJson(imgApiUrl);
+          const firstImg = files.find(f => f.type === "file" && f.name.match(/\.(jpg|jpeg|png|gif|webp)$/i));
+          if (firstImg) {
+            imgUrl = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${item.path}/images/${firstImg.name}`;
           }
-
-          // Build card
-          const card = document.createElement("a");
-          card.href = `./${item.name}/`;
-          card.className = "card";
-
-          card.innerHTML = `
-            <div class="thumb">
-              <img src="${imgUrl}" alt="${item.name}">
-            </div>
-            <div class="label">${item.name}</div>
-          `;
-
-          grid.appendChild(card);
+        } catch (e) {
+          console.log("No images folder in", item.name);
         }
+
+        // Build card
+        const card = document.createElement("a");
+        card.href = `./${item.name}/`;
+        card.className = "card";
+
+        card.innerHTML = `
+          <div class="thumb">
+            <img src="${imgUrl}" alt="${item.name}">
+          </div>
+          <div class="label">${item.name}</div>
+        `;
+
+        grid.appendChild(card);
       }
     }
+  }
 
-    loadDirs();
-  </script>
+  loadDirs();
+</script>
 </body>
 </html>
